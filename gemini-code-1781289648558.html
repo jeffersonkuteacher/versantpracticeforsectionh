@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Versant Section H: Passage Reconstruction</title>
+    <style>
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            background-color: #e9ecef;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .versant-window {
+            background-color: #ffffff;
+            width: 900px;
+            height: 550px;
+            box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.2);
+            border: 1px solid #d1d1d1;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        /* --- Header Styles --- */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 40px;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .icon-circle {
+            background-color: #464646;
+            color: white;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .title {
+            color: #1a3668;
+            font-size: 24px;
+            font-weight: bold;
+            margin: 0;
+        }
+
+        .header-right-text {
+            color: #333;
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        /* --- Intro Screen Styles --- */
+        #intro-screen {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .intro-text-box {
+            background-color: #f4f4f4;
+            margin: 0 40px;
+            padding: 15px 20px;
+            font-size: 13px;
+            color: #333;
+            line-height: 1.5;
+        }
+
+        /* --- Visual Example Boxes in Instructions --- */
+        .example-container {
+            display: flex;
+            gap: 20px;
+            margin: 20px 40px 0 40px;
+        }
+
+        .example-col {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .example-label {
+            font-weight: bold;
+            color: #1a3668;
+            margin-bottom: 5px;
+            font-size: 14px;
+        }
+
+        .example-box {
+            position: relative;
+            padding: 20px 40px 20px 20px;
+            color: white;
+            font-size: 13px;
+            line-height: 1.5;
+            min-height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+
+        .box-read {
+            background-color: #464646;
+        }
+
+        .box-type {
+            background-color: #2b3d5b;
+            font-style: italic;
+        }
+
+        .example-icon {
+            position: absolute;
+            bottom: 10px;
+            right: 15px;
+            width: 35px;
+            height: 35px;
+            color: white;
+        }
+
+        /* --- Quiz Content Styles --- */
+        #quiz-screen {
+            display: none;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .instructions {
+            padding: 0px 40px 10px 40px;
+            color: #1a3668;
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        .question-container {
+            flex: 1;
+            margin: 0 40px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Reading Box */
+        #reading-phase {
+            background-color: #464646;
+            color: white;
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+            font-size: 18px;
+            line-height: 1.6;
+            text-align: left;
+        }
+
+        /* Typing Box */
+        #typing-phase {
+            display: none;
+            flex-direction: column;
+            flex: 1;
+            background-color: #2b3d5b;
+            padding: 20px;
+        }
+
+        #user-input {
+            width: 100%;
+            height: 100%;
+            background-color: transparent;
+            color: white;
+            border: none;
+            outline: none;
+            font-size: 18px;
+            font-family: Arial, Helvetica, sans-serif;
+            resize: none;
+            line-height: 1.5;
+        }
+
+        /* --- Footer & Timer Styles --- */
+        .footer {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            padding: 20px 40px;
+            gap: 20px;
+        }
+
+        .timer-group {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .progress-bg {
+            background-color: #e0e0e0;
+            width: 80px;
+            height: 6px;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            background-color: #2ecc71;
+            height: 100%;
+            width: 100%;
+            transition: width 1s linear;
+        }
+
+        .timer-text {
+            font-size: 16px;
+            font-weight: bold;
+            color: #333;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .icon-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #1a3668; 
+            font-weight: bold; 
+            font-size: 16px; 
+            gap: 8px;
+        }
+
+        .icon-btn:hover {
+            opacity: 0.8;
+        }
+
+        /* --- End Screen Styles --- */
+        #end-screen {
+            display: none;
+            flex-direction: column;
+            height: 100%;
+            background-color: #f8f9fa;
+        }
+
+        .feedback-container {
+            padding: 20px 40px;
+            overflow-y: auto;
+            flex: 1;
+        }
+
+        .score-banner {
+            background-color: #1a3668;
+            color: white;
+            padding: 15px;
+            border-radius: 4px;
+            text-align: center;
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        .results-list {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .results-list li {
+            background: #fff;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 6px;
+            border-left: 6px solid #1a3668;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        .feedback-section {
+            margin-top: 10px;
+            font-size: 14px;
+            color: #333;
+        }
+
+        .feedback-tips {
+            background-color: #eafaf1;
+            color: #27ae60;
+            padding: 10px;
+            border-radius: 4px;
+            margin-top: 10px;
+            font-weight: bold;
+        }
+        
+        .feedback-warning {
+            background-color: #fcf3cf;
+            color: #b9770e;
+            padding: 10px;
+            border-radius: 4px;
+            margin-top: 10px;
+            font-weight: bold;
+        }
+
+        .restart-btn {
+            padding: 12px 24px;
+            font-size: 16px;
+            background-color: #1a3668;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 4px;
+            margin: 20px auto;
+            display: block;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="versant-window">
+        
+        <div id="intro-screen">
+            <div class="header">
+                <div class="header-left">
+                    <div class="icon-circle">H</div>
+                    <h1 class="title">Passage Reconstruction</h1>
+                </div>
+                <div class="header-right-text">Instructions</div>
+            </div>
+
+            <div class="intro-text-box">
+                You will have <strong>30 seconds</strong> to read a short paragraph. After 30 seconds, the paragraph will disappear from the screen.<br><br>
+                Then, you will hear "Begin" and have <strong>90 seconds</strong> to reconstruct the paragraph. Show that you understood the passage by rewriting it in your own words. Your answer will be scored for clear and accurate content, not word-for-word memorization. After 90 seconds, your work will be saved automatically.
+            </div>
+
+            <div class="example-container">
+                <div class="example-col">
+                    <div class="example-label">You read:</div>
+                    <div class="example-box box-read">
+                        Mike went for 10 job interviews. After the last interview, he finally received a job offer.
+                        <svg class="example-icon" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
+                        </svg>
+                    </div>
+                </div>
+                <div class="example-col">
+                    <div class="example-label">You type:</div>
+                    <div class="example-box box-type">
+                        Mike went for 10 job interviews. After the last interview, he finally received a job offer.
+                        <svg class="example-icon" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M20 5H4c-1.1 0-1.99.9-1.99 2L2 17c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm-9 3h2v2h-2V8zm0 3h2v2h-2v-2zM8 8h2v2H8V8zm0 3h2v2H8v-2zm-1 2H5v-2h2v2zm0-3H5V8h2v2zm9 7H8v-2h8v2zm0-4h-2v-2h2v2zm0-3h-2V8h2v2zm3 3h-2v-2h2v2zm0-3h-2V8h2v2z"/>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+
+            <div style="flex: 1;"></div> 
+
+            <div class="footer">
+                <button class="icon-btn" onclick="startPractice()">
+                    Start Practice ➔
+                </button>
+            </div>
+        </div>
+
+        <div id="quiz-screen">
+            <div class="header">
+                <div class="header-left">
+                    <div class="icon-circle">H</div>
+                    <h1 class="title">Passage Reconstruction</h1>
+                </div>
+                <div class="header-right-text" id="question-counter">1 / 5</div>
+            </div>
+
+            <div class="instructions" id="instruction-text">Please read the passage.</div>
+
+            <div class="question-container">
+                <div id="reading-phase">
+                    <span id="passage-display">Loading passage...</span>
+                </div>
+
+                <div id="typing-phase">
+                    <textarea id="user-input" placeholder="Start typing here..." autocomplete="off" spellcheck="false"></textarea>
+                </div>
+            </div>
+
+            <div class="footer">
+                <div class="timer-group">
+                    <div class="progress-bg">
+                        <div class="progress-fill" id="timer-bar"></div>
+                    </div>
+                    <div class="timer-text">
+                        ⏱ <span id="timer-text-val">00'30"</span>
+                    </div>
+                </div>
+                
+                <button class="icon-btn" id="next-btn" onclick="handleManualNext()">
+                    Next ➔
+                </button>
+            </div>
+        </div>
+
+        <div id="end-screen">
+            <div class="header">
+                <div class="header-left">
+                    <div class="icon-circle">✔</div>
+                    <h1 class="title">Practice Complete</h1>
+                </div>
+                <div class="header-right-text">Feedback</div>
+            </div>
+            
+            <div class="feedback-container">
+                <div class="score-banner" id="final-score-banner">
+                    Calculating Score...
+                </div>
+
+                <p style="margin-top: 0; color: #555;">Review your performance below. Evaluation is based on capturing the main ideas, punctuation, and length.</p>
+                <ul class="results-list" id="results-list">
+                    </ul>
+                <button class="restart-btn" onclick="location.reload()">Restart Practice</button>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        const passages = [
+            {
+                text: "The company announced a new remote work policy today. Employees can work from home three days a week. This change aims to improve work-life balance and reduce office costs. Management expects a slight increase in overall productivity.",
+                keywords: ["company", "remote", "work", "policy", "employees", "home", "three days", "balance", "costs", "management", "productivity"]
+            },
+            {
+                text: "Sarah went to the grocery store to buy ingredients for a cake. She needed flour, sugar, and eggs, but forgot her wallet at home. She had to drive all the way back, which delayed her baking by an hour.",
+                keywords: ["sarah", "grocery", "store", "buy", "ingredients", "cake", "flour", "sugar", "eggs", "forgot", "wallet", "home", "drive", "delayed", "baking"]
+            },
+            {
+                text: "The flight to London was delayed due to heavy snow. Passengers waited in the terminal for over four hours. Finally, the airline provided meal vouchers and announced a new departure time for late evening.",
+                keywords: ["flight", "london", "delayed", "snow", "passengers", "waited", "terminal", "four hours", "airline", "meal", "vouchers", "departure", "evening"]
+            },
+            {
+                text: "A recent software update caused major issues for mobile phone users. Many reported that their batteries drained twice as fast. The developers are currently working on a patch to fix the bug and restore normal performance.",
+                keywords: ["software", "update", "issues", "mobile", "phone", "users", "batteries", "drained", "fast", "developers", "patch", "fix", "bug", "performance"]
+            },
+            {
+                text: "The university library is extending its hours for final exam week. It will now remain open until midnight from Monday to Friday. Students are encouraged to use the study rooms, but they must book them in advance.",
+                keywords: ["university", "library", "extending", "hours", "exam", "week", "midnight", "monday", "friday", "students", "study", "rooms", "book", "advance"]
+            }
+        ];
+
+        let currentIndex = 0;
+        let timeLeft = 0;
+        let totalPhaseTime = 0;
+        let timerInterval;
+        let currentPhase = 'reading'; // 'reading' or 'typing'
+        let userResponses = [];
+
+        // DOM Elements
+        const introScreen = document.getElementById('intro-screen');
+        const quizScreen = document.getElementById('quiz-screen');
+        const endScreen = document.getElementById('end-screen');
+        const questionCounter = document.getElementById('question-counter');
+        const instructionText = document.getElementById('instruction-text');
+        const readingPhaseDiv = document.getElementById('reading-phase');
+        const typingPhaseDiv = document.getElementById('typing-phase');
+        const passageDisplay = document.getElementById('passage-display');
+        const userInput = document.getElementById('user-input');
+        const timerTextVal = document.getElementById('timer-text-val');
+        const timerBar = document.getElementById('timer-bar');
+        const finalScoreBanner = document.getElementById('final-score-banner');
+
+        function startPractice() {
+            introScreen.style.display = 'none';
+            quizScreen.style.display = 'flex';
+            loadPassage();
+        }
+
+        function loadPassage() {
+            // Reset phase to reading
+            currentPhase = 'reading';
+            instructionText.innerText = "Please read the passage.";
+            readingPhaseDiv.style.display = 'flex';
+            typingPhaseDiv.style.display = 'none';
+            userInput.value = "";
+            
+            questionCounter.innerText = `${currentIndex + 1} / ${passages.length}`;
+            passageDisplay.innerText = passages[currentIndex].text;
+
+            startTimer(30); // 30 Seconds for reading
+        }
+
+        function startTypingPhase() {
+            currentPhase = 'typing';
+            instructionText.innerText = "Please reconstruct the passage.";
+            readingPhaseDiv.style.display = 'none';
+            typingPhaseDiv.style.display = 'flex';
+            
+            // Play custom "Begin" audio
+            const beginAudio = new Audio("https://github.com/jeffersonkuteacher/versantpracticeforsectionh/raw/refs/heads/main/ElevenLabs_Untitled_project%20(1).mp3");
+            beginAudio.play().catch(error => console.log("Audio play prevented:", error));
+
+            userInput.focus();
+            startTimer(90); // 90 Seconds for typing
+        }
+
+        function startTimer(seconds) {
+            clearInterval(timerInterval);
+            timeLeft = seconds;
+            totalPhaseTime = seconds;
+            updateTimerUI();
+
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                updateTimerUI();
+                
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    autoAdvance();
+                }
+            }, 1000);
+        }
+
+        function updateTimerUI() {
+            let mins = Math.floor(timeLeft / 60);
+            let secs = timeLeft % 60;
+            let secsStr = secs < 10 ? '0' + secs : secs;
+            timerTextVal.innerText = `0${mins}'${secsStr}"`;
+
+            let percentage = (timeLeft / totalPhaseTime) * 100;
+            timerBar.style.width = `${percentage}%`;
+            
+            if (timeLeft <= 10) timerBar.style.backgroundColor = '#e74c3c';
+            else timerBar.style.backgroundColor = '#2ecc71';
+        }
+
+        function handleManualNext() {
+            clearInterval(timerInterval);
+            autoAdvance();
+        }
+
+        function autoAdvance() {
+            if (currentPhase === 'reading') {
+                startTypingPhase();
+            } else if (currentPhase === 'typing') {
+                saveAndNext();
+            }
+        }
+
+        function saveAndNext() {
+            // Save answer even if empty
+            userResponses.push({
+                original: passages[currentIndex].text,
+                keywords: passages[currentIndex].keywords,
+                typed: userInput.value.trim()
+            });
+
+            currentIndex++;
+            if (currentIndex < passages.length) {
+                loadPassage();
+            } else {
+                showEndScreen();
+            }
+        }
+
+        function evaluateResponse(expectedKeywords, typedText) {
+            if (!typedText) return { score: 0, feedback: "No text was provided.", tipClass: "feedback-warning" };
+
+            let textLower = typedText.toLowerCase();
+            let matchCount = 0;
+
+            expectedKeywords.forEach(kw => {
+                if (textLower.includes(kw.toLowerCase())) {
+                    matchCount++;
+                }
+            });
+
+            // Calculate basic keyword coverage
+            let coverage = matchCount / expectedKeywords.length;
+            
+            // Evaluate Punctuation and Capitalization
+            let startsWithCapital = /^[A-Z]/.test(typedText);
+            let endsWithPunctuation = /[.!?]$/.test(typedText.trim());
+
+            let feedbackMsg = "";
+            let tipClass = "feedback-tips";
+
+            if (coverage >= 0.7) {
+                feedbackMsg += "Excellent job capturing the main ideas. ";
+            } else if (coverage >= 0.4) {
+                feedbackMsg += "You captured some of the context, but missed a few key details. ";
+                tipClass = "feedback-warning";
+            } else {
+                feedbackMsg += "The text drifted significantly from the main idea of the passage. ";
+                tipClass = "feedback-warning";
+            }
+
+            if (!startsWithCapital || !endsWithPunctuation) {
+                feedbackMsg += "Watch your mechanics: ensure your sentences start with a capital letter and end with proper punctuation.";
+                tipClass = "feedback-warning";
+            } else {
+                feedbackMsg += "Good spelling and sentence mechanics detected.";
+            }
+
+            // Standardize score out of 100
+            let score = Math.round(coverage * 100);
+            if (score > 100) score = 100;
+
+            return { score: score, feedback: feedbackMsg, tipClass: tipClass };
+        }
+
+        function showEndScreen() {
+            quizScreen.style.display = 'none';
+            endScreen.style.display = 'flex';
+
+            const resultsList = document.getElementById('results-list');
+            let totalScoreAcc = 0;
+
+            userResponses.forEach((res, index) => {
+                let evaluation = evaluateResponse(res.keywords, res.typed);
+                totalScoreAcc += evaluation.score;
+
+                const li = document.createElement('li');
+                li.innerHTML = `
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                        <strong style="color: #1a3668; font-size: 16px;">Passage ${index + 1}</strong>
+                        <span style="background-color: ${evaluation.score >= 70 ? '#2ecc71' : evaluation.score >= 40 ? '#f39c12' : '#e74c3c'}; color: white; padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: bold;">Accuracy: ${evaluation.score}%</span>
+                    </div>
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                        <div style="background: #f4f4f4; padding: 10px; border-radius: 4px; font-size: 13px;">
+                            <strong style="color: #555;">Original Passage:</strong><br>
+                            ${res.original}
+                        </div>
+                        <div style="background: #eef2f7; padding: 10px; border-radius: 4px; font-size: 13px;">
+                            <strong style="color: #1a3668;">You Typed:</strong><br>
+                            ${res.typed || "<em>(Left blank)</em>"}
+                        </div>
+                    </div>
+
+                    <div class="feedback-section ${evaluation.tipClass}">
+                        <strong>AI Tip:</strong> ${evaluation.feedback}
+                    </div>
+                `;
+                resultsList.appendChild(li);
+            });
+
+            // Calculate and display overall accuracy
+            let finalScore = userResponses.length > 0 ? Math.round(totalScoreAcc / userResponses.length) : 0;
+            finalScoreBanner.innerText = `Final Overall Accuracy: ${finalScore}%`;
+        }
+    </script>
+</body>
+</html>
